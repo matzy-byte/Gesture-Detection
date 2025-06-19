@@ -20,7 +20,6 @@ def main():
     )
     train_data, rest_data = data.split(0.8)
     validation_data, test_data = rest_data.split(0.5)
-
     
     model = gesture_recognizer.GestureRecognizer.create(
         train_data=train_data,
