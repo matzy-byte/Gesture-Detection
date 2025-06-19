@@ -13,11 +13,9 @@ def save_result(result, output_image, timestamp_ms):
     
     if result.gestures[0][0].category_name != value:
         value = result.gestures[0][0].category_name
-        print("Gesture:", value)
+    print("Gesture:", result.gestures[0][0].category_name)
         
 
-value = None  # track last gesture to avoid repeats
-# Load model
 BASE = python.BaseOptions("gesture_recognizer.task")
 OPTIONS = vision.GestureRecognizerOptions(
     base_options=BASE,
@@ -25,39 +23,36 @@ OPTIONS = vision.GestureRecognizerOptions(
     result_callback=save_result
 )
 RECOGNIZER = vision.GestureRecognizer.create_from_options(OPTIONS)
+value = None
 
-# Set up camera
-TITLE_CAPTURE = "Capture"
-CAP = cv.VideoCapture(0)
-CAP.set(cv.CAP_PROP_FRAME_WIDTH, 320)
-CAP.set(cv.CAP_PROP_FRAME_HEIGHT, 240)
-#cv.namedWindow(TITLE_CAPTURE, cv.WINDOW_AUTOSIZE)
 
-frame_counter = 0
-process_every_n = CAP.get(cv.CAP_PROP_FPS) // 2
-print(process_every_n)
-# Frame loop
-while True:
-    ret, image = CAP.read()
-    if not ret:
-        break
+def main():
+    CAP = cv.VideoCapture(0)
+    CAP.set(cv.CAP_PROP_FRAME_WIDTH, 320)
+    CAP.set(cv.CAP_PROP_FRAME_HEIGHT, 240)
 
-    frame_counter += 1
-    #cv.imshow(TITLE_CAPTURE, image)
-    
-    if frame_counter % process_every_n == 0:
-        rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-        mp_image = mp.Image(
-            image_format=mp.ImageFormat.SRGB,
-            data=rgb
-        )
-        timestamp = int(time.time() * 1000)
-        RECOGNIZER.recognize_async(mp_image, timestamp)
+    frame_counter = 0
+    PROCESS_EVERY_N = CAP.get(cv.CAP_PROP_FPS) // 2
 
-    key = cv.waitKey(10)
-    if key == ord('q'):
-        break
+    while True:
+        ret, image = CAP.read()
+        if not ret:
+            break
 
-RECOGNIZER.close()
-CAP.release()
-cv.destroyAllWindows()
+        frame_counter += 1
+        if frame_counter % PROCESS_EVERY_N == 0:
+            rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            mp_image = mp.Image(
+                image_format=mp.ImageFormat.SRGB,
+                data=rgb
+            )
+            timestamp = int(time.time() * 1000)
+            RECOGNIZER.recognize_async(mp_image, timestamp)
+            frame_counter = 0
+
+    RECOGNIZER.close()
+    CAP.release()
+
+
+if __name__ == "__main__":
+    main()
