@@ -1,13 +1,12 @@
 [project]
-name        = "Gesture-Detection"
+name        = "Gesture-Detection-Training"
 version     = "0.0.1"
-description = "Detect various gestures and classify commands"
+description = "Training a customized model"
 readme      = "README.md"
-keywords    = ["opencv", "computer vision", "visual computing"]
+keywords    = ["deep-learning", "tensorflow", "tensorflow-lite", "mediapipe-model-maker"]
 requires-python = ">=3.9.0,<=3.12.10"
 dependencies    = [
-  "opencv-python>=4.8.0.74",
-  "mediapipe>=0.10.18",
+  "tensorflow[and-cuda]==2.15.0",
   "mediapipe-model-maker>=0.2.1.4"
 ]
 

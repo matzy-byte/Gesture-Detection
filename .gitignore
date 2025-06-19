@@ -1,4 +1,5 @@
-gesture_dataset/*
+gestures-dataset/
+exported_model/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
