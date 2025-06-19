@@ -1,0 +1,14 @@
+[project]
+name        = "Gesture-Detection-Training"
+version     = "0.0.1"
+description = "Training a customized model"
+readme      = "README.md"
+keywords    = ["deep-learning", "tensorflow", "tensorflow-lite", "mediapipe-model-maker"]
+requires-python = ">=3.9.0,<=3.12.10"
+dependencies    = [
+  "mediapipe-model-maker>=0.2.1.4"
+]
+
+[tool.yapf]
+based_on_style = "pep8"
+column_limit = 120
