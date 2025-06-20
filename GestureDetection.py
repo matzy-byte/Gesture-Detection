@@ -1,21 +1,46 @@
+import paho.mqtt.publish as publish
 import cv2 as cv
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import time
+import math
 
+
+def get_distance(p1, p2):
+    return math.sqrt(sum((a - b) ** 2 for a, b in zip(p1, p2)))
 
 def save_result(result, output_image, timestamp_ms):
+    global HOST
     global value
-    
+
     if not result.gestures:
+        value["category"] = "none"
+        value["landmark"] = (0, 0, 0)
+        publish.single("gesture", value["category"], 2, hostname=HOST)
         return
-    
-    if result.gestures[0][0].category_name != value:
-        value = result.gestures[0][0].category_name
-    print("Gesture:", result.gestures[0][0].category_name)
+
+    category = result.gestures[0][0].category_name
+    if not category or category == "none":
+        value["category"] = "none"
+        value["landmark"] = (0, 0, 0)
+        publish.single("gesture", value["category"], 2, hostname=HOST)
+        return
+
+    landmark = (
+        result.hand_landmarks[0][0].x,
+        result.hand_landmarks[0][0].y,
+        result.hand_landmarks[0][0].z
+    )
+    if category != value["category"]:
+        value["category"] = category
+        value["landmark"] = landmark
+        print("Gesture:", category)
+        publish.single("gesture", value["category"], 2, hostname=HOST)
+        return
         
 
+HOST = "localhost"
 BASE = python.BaseOptions("gesture_recognizer.task")
 OPTIONS = vision.GestureRecognizerOptions(
     base_options=BASE,
@@ -23,7 +48,10 @@ OPTIONS = vision.GestureRecognizerOptions(
     result_callback=save_result
 )
 RECOGNIZER = vision.GestureRecognizer.create_from_options(OPTIONS)
-value = None
+value = {
+    "category": "none",
+    "landmark": (0, 0, 0)
+}
 
 
 def main():
